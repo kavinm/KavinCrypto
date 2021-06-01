@@ -1,6 +1,6 @@
 const Block = require('./block'); // requires Block class to exist in block.js
 const { GENESIS_DATA } = require('./config'); // requires genesis data to exist
-
+const cryptoHash = require('./crypto-hash');
 
 
 //describe creates the test case for the Block class
@@ -50,15 +50,22 @@ describe('mineBlock()', () =>{
 
     it('sets the `lasthash` to be the `hash` of the lastBlock ', () =>{
         expect(minedBlock.lastHash).toEqual(lastBlock.hash); // we need to have the actual value in the expect statement and the expected value second for jest
-    });
+    });                                                     // functionally either order will work but this is how it's done for tdd in jest
 
     it('sets the `data`', () =>{
         expect(minedBlock.data).toEqual(data);
     } );
 
+    // check to see if timestamp is not undefined, can be a different value
     it('sets a `timestamp`', () =>{
-        expect(minedBlock.timestamp).not.toEqual(undefined); // check to see if timestamp is not undefined, can be a different value
+        expect(minedBlock.timestamp).not.toEqual(undefined); 
     } );
+
+    //hash of minedBlock must equal sha256 of its timestamp, previousBlock's hash and the data 
+    it('creates a SHA-256 `hash` based on the proper inputs', () =>{    
+        expect(minedBlock.hash)
+            .toEqual(cryptoHash(minedBlock.timestamp, lastBlock.hash, data));    
+    })
 });
 
 });

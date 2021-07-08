@@ -14,6 +14,10 @@ class Blockchain{
 
         this.chain.push(newBlock);
     }
+
+    static isValidChain(chain){
+        return true;
+    }
 }
 
 module.exports = Blockchain;

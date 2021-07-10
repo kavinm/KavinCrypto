@@ -27,13 +27,13 @@ class Blockchain{
         for(let i=1; i<chain.length; i++){
             const block = chain[i]; //local block copied from chain
 
-            const actualLastHash = chain[i-1].hash;
+            const actualLastHash = chain[i-1].hash; //get real last Hash
 
-            const {timestamp, lastHash, hash, data } = block;
+            const {timestamp, lastHash, hash, data } = block; // store local copies
 
-            if (lastHash !== actualLastHash) return false; 
+            if (lastHash !== actualLastHash) return false;  //check if lastHash matches up
 
-            const validatedHash = cryptoHash(timestamp, lastHash, data);
+            const validatedHash = cryptoHash(timestamp, lastHash, data); //validate hash
 
             if(hash !== validatedHash){
                 return false;
@@ -41,6 +41,21 @@ class Blockchain{
         }
 
         return true;
+    }
+
+    replaceChain(chain){ 
+        //if chain is not longer exit
+        if(chain.length <= this.chain.length){
+            console.error('the incoming chain must be longer');
+            return;
+        }
+        //validate chain
+        if (!Blockchain.isValidChain(chain)){
+            console.error('the incoming chain must be valid');
+            return;
+        }
+        console.log('replacing chain with ', chain);
+        this.chain = chain;
     }
 }
 

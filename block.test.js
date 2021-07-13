@@ -74,8 +74,20 @@ describe("Block", () => {
             //hash of minedBlock must equal sha256 of its timestamp, previousBlock's hash and the data
             it("creates a SHA-256 `hash` based on the proper inputs", () => {
                 expect(minedBlock.hash).toEqual(
-                    cryptoHash(minedBlock.timestamp, lastBlock.hash, data)
+                    cryptoHash(
+                        minedBlock.timestamp,
+                        minedBlock.nonce,
+                        minedBlock.difficulty,
+                        lastBlock.hash,
+                        data
+                    )
                 );
+            });
+
+            it("sets a 'hash' that matches the difficulty critera", () => {
+                expect(
+                    minedBlock.hash.substring(0, minedBlock.difficulty)
+                ).toEqual("0".repeat(minedBlock.difficulty));
             });
         });
     });

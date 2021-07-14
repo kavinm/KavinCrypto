@@ -29,12 +29,17 @@ class Block {
         let hash, timestamp;
         //const timestamp = Date.now();
         const lastHash = lastBlock.hash;
-        const { difficulty } = lastBlock; // destructuring syntax same as const difficulty = lastBlock.difficulty
+        let { difficulty } = lastBlock; // destructuring syntax same as  difficulty = lastBlock.difficulty
         let nonce = 0; //adjustable/dynamic value
 
         do {
             nonce++;
             timestamp = Date.now();
+            // difficulty is adjusted based on lastBlock and current timestamp
+            difficulty = Block.adjustDifficulty({
+                originalBlock: lastBlock,
+                timestamp,
+            });
             hash = cryptoHash(timestamp, lastHash, data, nonce, difficulty);
         } while (hash.substring(0, difficulty) !== "0".repeat(difficulty)); // checks for leading zeroes
 
@@ -48,10 +53,16 @@ class Block {
         });
     }
 
+    //change difficulty based on difference of timeStamp of currentBlock vs lastBlock
     static adjustDifficulty({ originalBlock, timestamp }) {
         const { difficulty } = originalBlock; // destructred , same as const difficulty = originalBlock.difficulty
 
         const difference = timestamp - originalBlock.timestamp;
+
+        //lower limit of 1, otherwise errors will occur
+        if (difficulty < 1) {
+            return 1;
+        }
 
         if (difference > MINE_RATE) {
             return difficulty - 1;

@@ -1,18 +1,22 @@
 {
-  "name": "cryptochain",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest --watchAll"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "jest": "^23.6.0"
-  },
-  "dependencies": {
-    "hex-to-binary": "^1.0.1"
-  }
+    "name": "cryptochain",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest --watchAll",
+        "start": "node index.js",
+        "dev": "nodemon index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "jest": "^23.6.0",
+        "nodemon": "^1.18.4"
+    },
+    "dependencies": {
+        "express": "^4.16.3",
+        "hex-to-binary": "^1.0.1"
+    }
 }

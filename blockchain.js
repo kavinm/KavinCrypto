@@ -28,7 +28,7 @@ class Blockchain {
 
             const actualLastHash = chain[i - 1].hash; //get real last Hash
 
-            //const { timestamp, lastHash, hash, data } = block; // store local copies
+            const lastDifficulty = chain[i - 1].difficulty;
 
             if (lastHash !== actualLastHash) return false; //check if lastHash matches up
 
@@ -41,6 +41,11 @@ class Blockchain {
             ); //validate hash
 
             if (hash !== validatedHash) {
+                return false;
+            }
+
+            //takes care of difficulty being raised too high or too low
+            if (Math.abs(lastDifficulty - difficulty) > 1) {
                 return false;
             }
         }

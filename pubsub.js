@@ -1,45 +1,55 @@
 //using pubnub instead of redis because getting redis setup was a hassle on windows
 
-const PubNub = require('pubnub');
-
-const credentials = {
-    publishKey = 'pub-c-2bacca64-0dff-4918-8e6b-b8bcf23d472e',
-    subscribeKey = 'sub-c-aece7564-e8f0-11eb-b05e-3ebc6f27b518',
-    secretKey = 'sec-c-ZTUxYTFiMTgtNmUyOC00YzE5LTg5MTEtYTZiYmRjMTEwMGEw'
-};
+const redis = require("redis");
 
 const CHANNELS = {
-    TEST: 'Test',
-    TESTTWO: 'TESTTWO'
+    TEST: "TEST",
+    BLOCKCHAIN: "BLOCKCHAIN"
 };
 
-class PubSub{
-    constructor(){
-        this.pubnub = new PubNub(credentials);
+class PubSub {
+    constructor({blockchain}) {
+        this.blockchain = blockchain;
 
-        
-        
-        //subscribe to the channel
-        this.pubnub.subscribe({channels: [Object.values(CHANNELS)] }); //Object.values will return an array of all the values for that object
-        
-        //listener for the channel
-        this.pubnub.addListener(this.listener());
+        this.publisher = redis.createClient();
+        this.subscriber = redis.createClient();
+
+        this.subscribeToChannels();
+
+        //second parameter is a callback function that fires everytime a message is received
+        this.subscriber.on("message", (channel, message) =>
+            this.handleMessage(channel, message)
+        );
     }
 
-    listener(){
-        return{
-            //messageObject contains what the message is and channel published to, metadata (timestamp etc)
-            message: messageObject =>{
-                const {channel, message} = messageObject;
+    handleMessage(channel, message) {
+        console.log(
+            `Message received. Channel: ${channel}. Message: ${message}.`
+        );
 
-                console.log(`Message received. Channel: ${channel}. Message: ${message}`);
-            }
-        };
+        const parsedMessage = JSON.parse(message);
+
+        if(channel === CHANNELS.BLOCKCHAIN){
+            this.blockchain.replaceChain(parsedMessage);
+        }
     }
 
-    //publisher for the channel
+    //subscribes to all channels
+    subscribeToChannels() {
+        Object.values(CHANNELS).forEach(channel =>{
+            this.subscriber.subscribe(channel);
+        });
+    }
     publish({channel, message}){
-        this.pubnub.publish({channel, message});
+        this.publisher.publish(channel, message);
+    }
+
+    broadcastChain(){
+        this.publish({
+            channel : CHANNELS.BLOCKCHAIN,
+            message: JSON.stringify(this.blockchain.chain)
+        });
     }
 }
+
 module.exports = PubSub;

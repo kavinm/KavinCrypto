@@ -40,8 +40,13 @@ class PubSub {
             this.subscriber.subscribe(channel);
         });
     }
+    // unsubscribe temporarily to not have the message sent to the publisher
     publish({channel, message}){
-        this.publisher.publish(channel, message);
+        this.subscriber.unsubscribe(channel, () =>{
+            this.publisher.publish(channel, message, () =>{
+                this.subscriber.subscribe(channel);
+            });
+        });
     }
 
     broadcastChain(){

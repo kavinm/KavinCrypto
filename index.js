@@ -2,12 +2,17 @@ const bodyParser = require("body-parser");
 
 const express = require("express");
 
+const request = require('request');
+
 const Blockchain = require("./blockchain");
 const PubSub = require("./pubsub");
 
 const app = express();
 const blockchain = new Blockchain();
 const pubsub = new PubSub({blockchain});
+
+const DEFAULT_PORT = 3000;
+const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 
 setTimeout(() => pubsub.broadcastChain(), 1000);
 app.use(bodyParser.json());
@@ -32,8 +37,18 @@ app.post("/api/mine", (req, res) => {
     res.redirect("/api/blocks");
 });
 
-const DEFAULT_PORT = 3000;
-
+//makes a GET HTTP request 
+const syncChains = () =>{
+    //when the request completes, callback is fired
+    request({url: `${ROOT_NODE_ADDRESS}/api/blocks`}, (error, response, body) =>{
+        if(!error && response.statusCode === 200){
+            //if request is successful, replace chain
+            const rootChain = JSON.parse(body);
+            console.log('replace chain on a sync with', rootChain);
+            blockchain.replaceChain(rootChain);           
+        }
+    });
+};
 let PEER_PORT;
 
 //generates a random port from 3001-4000
@@ -42,4 +57,7 @@ if(process.env.GENERATE_PEER_PORT === 'true'){
 }
 
 const PORT = PEER_PORT || DEFAULT_PORT;
-app.listen(PORT, () => console.log(`listening at localhost:${PORT}`));
+app.listen(PORT, () =>{
+    console.log(`listening at localhost:${PORT}`);
+    syncChains();
+} );

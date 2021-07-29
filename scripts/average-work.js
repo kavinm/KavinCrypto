@@ -1,4 +1,6 @@
-const Blockchain = require("./blockchain");
+//don't need to specify index.js as it is used automatically for a directory we specify
+const Blockchain = require("../blockchain"); 
+
 
 const blockchain = new Blockchain();
 

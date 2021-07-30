@@ -1,5 +1,6 @@
 const {STARTING_BALANCE} = require('../config');
 const {ec} = require('../util');
+const cryptoHash = require('../util/crypto-hash');
 
 class Wallet {
 
@@ -7,10 +8,16 @@ class Wallet {
         this.balance = STARTING_BALANCE;
 
         //elliptic curve public/private key pair
-        const keyPair = ec.genKeyPair();
+         this.keyPair = ec.genKeyPair();
 
         //encoded in hex because this will return a Point object 
-        this.publicKey = keyPair.getPublic().encode('hex');
+        this.publicKey = this.keyPair.getPublic().encode('hex');
+
+    }
+
+    sign(data){
+        return this.keyPair.sign(cryptoHash(data));
+
     }
 
 };

@@ -1,4 +1,5 @@
 const { intFromLE } = require('elliptic/lib/elliptic/utils');
+const { verifySignature } = require('../util');
 const Wallet = require('./index');
 const Transaction = require('./transaction');
 
@@ -30,5 +31,35 @@ describe('Transaction', () =>{
             expect(transaction.outputMap[senderWallet.publicKey])
                 .toEqual(senderWallet.balance - amount);
         });
+    });
+
+    describe('input', () =>{
+        it('has an input', () =>{
+            expect(transaction).toHaveProperty('input');
+        });
+
+        it('has a `timestamp` in the input', () =>{
+            expect(transaction.input).toHaveProperty('timestamp');
+        });
+
+        it('sets the `amount` to the `senderWallet` balance', () =>{
+            expect(transaction.input.amount).toEqual(senderWallet.balance);
+        });
+
+        it('sets the `address` to the `senderWallet` publicKey', () =>{
+            expect(transaction.input.address).toEqual(senderWallet.publicKey);
+        });
+
+        it('signs the input ', () =>{
+            expect(
+                verifySignature({
+                    publicKey: senderWallet.publicKey,
+                    data: transaction.outputMap,
+                    signature: transaction.input.signature
+                })
+            ).toBe(true);
+           
+        });
+
     });
 });

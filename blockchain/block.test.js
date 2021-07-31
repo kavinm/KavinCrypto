@@ -1,7 +1,7 @@
 const hexToBinary = require("hex-to-binary");
 const Block = require("./block"); // requires Block class to exist in block.js
 const { GENESIS_DATA, MINE_RATE } = require("../config"); // requires genesis data to exist
-const cryptoHash = require("../util/crypto-hash");
+const {cryptoHash} = require("../util/");
 
 //describe creates the test case for the Block class
 describe("Block", () => {

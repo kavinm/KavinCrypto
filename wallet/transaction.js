@@ -30,6 +30,14 @@ class Transaction{
         };
     }
 
+    update({senderWallet, recipient, amount}){
+        this.outputMap[recipient] = amount;
+
+        this.outputMap[senderWallet.publicKey] = this.outputMap[senderWallet.publicKey] - amount;
+
+        this.input = this.createInput({senderWallet, outputMap: this.outputMap});
+    }
+
     static validTransaction(transaction){
        
         const {input:  {address, amount, signature} , outputMap} = transaction;
@@ -38,8 +46,6 @@ class Transaction{
 
        const outputTotal = Object.values(outputMap).reduce((total, outputAmount) =>
             total + outputAmount);
-        console.log(`This is the amount: ${amount}`);
-        console.log(`This is the outputTotal: ${outputTotal}`);
         //check if amount from transaction matches up
         if (amount!==outputTotal){
             console.error(`Invalid transaction from ${address}`);
@@ -48,7 +54,7 @@ class Transaction{
         
 
         if(!verifySignature({publicKey: address, data: outputMap, signature})){
-            console.log("\n NOT VALID \n");
+
             console.error(`Invalid signature from ${address}`);
 
             return false;

@@ -42,8 +42,7 @@ class Transaction{
             this.outputMap[recipient] = amount;
         }
         else{
-            console.log("this is the current output map amount: " + this.outputMap[recipient]);
-            console.log("this is the amount: " + amount);
+
             this.outputMap[recipient] = this.outputMap[recipient] + amount;
         }
 

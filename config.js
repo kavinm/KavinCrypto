@@ -14,4 +14,8 @@ const GENESIS_DATA = {
 
 const STARTING_BALANCE = 1000;
 
-module.exports = { GENESIS_DATA, MINE_RATE, STARTING_BALANCE }; // this exports the Genesis block
+const REWARD_INPUT = {address: 'AUTHORIZED-REWARD'};
+
+const MINING_REWARD = 50;
+
+module.exports = { GENESIS_DATA, MINE_RATE, STARTING_BALANCE, REWARD_INPUT, MINING_REWARD}; // this exports the Genesis block

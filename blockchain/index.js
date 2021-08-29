@@ -1,5 +1,6 @@
 const Block = require("./block");
 const Transaction = require('../wallet/transaction');
+const Wallet = require('../wallet');
 const {cryptoHash} = require("../util/");
 const { REWARD_INPUT, MINING_REWARD } = require("../config");
 
@@ -21,6 +22,10 @@ class Blockchain {
 
         for(let i = 1; i<chain.length; i++){
             const block = chain[i];
+
+            //Set allows us to create a unique group of elements
+            const transactionSet = new Set();
+
             let rewardTransactionCount = 0;
 
             
@@ -46,6 +51,24 @@ class Blockchain {
                         console.error('Invalid transaction');
                         return false;
                     }
+                    const trueBalance = Wallet.calculateBalance({
+                        chain: this.chain,
+                        address: transaction.input.address
+                    });
+
+                    if(transaction.input.amount !== trueBalance){
+                        console.error('Invalid Input amount');
+                        return false;
+                    }
+
+                    if(transactionSet.has((transaction))){
+                        console.error('An identical transaction appears more than once in the block');
+                        return false;
+                    }
+                    else{
+                        transactionSet.add(transaction);
+                    }
+
                 }
 
             }
@@ -91,7 +114,7 @@ class Blockchain {
         return true;
     }
 
-    replaceChain(chain, onSuccess) {
+    replaceChain(chain, validateTransactions, onSuccess) {
         //if chain is not longer exit
         if (chain.length <= this.chain.length) {
             console.error("the incoming chain must be longer");
@@ -100,6 +123,11 @@ class Blockchain {
         //validate chain
         if (!Blockchain.isValidChain(chain)) {
             console.error("the incoming chain must be valid");
+            return;
+        }
+
+        if(validateTransactions && !this.validTransactionData({chain})){
+            console.error('The incoming chain has invalid data');
             return;
         }
 

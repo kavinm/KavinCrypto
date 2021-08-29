@@ -57,7 +57,9 @@ app.post("/api/transact", (req, res) =>{
         }
         else{
             transaction = wallet.createTransaction({
-                recipient, amount
+                recipient, 
+                amount, 
+                chain: blockchain.chain
             });
         }
         
@@ -83,6 +85,15 @@ app.get('/api/mine-transactions', (req,res) =>{
     transactionMiner.mineTransactions();
 
     res.redirect('/api/blocks');
+});
+
+app.get('/api/wallet-info', (req, res) =>{
+    const address = wallet.publicKey;
+
+    res.json({
+        address,
+        balance: Wallet.calculateBalance({chain: blockchain.chain, address})
+    });
 });
 
 //makes a GET HTTP request 

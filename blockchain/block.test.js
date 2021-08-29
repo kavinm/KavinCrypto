@@ -37,7 +37,7 @@ describe("Block", () => {
     describe("genesis()", () => {
         const genesisBlock = Block.genesis();
 
-        console.log("genesisBlock", genesisBlock);
+        
 
         //checks if the genesisBlock is a block instance
         it("returns a Block instance", () => {

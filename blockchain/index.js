@@ -1,5 +1,7 @@
 const Block = require("./block");
+const Transaction = require('../wallet/transaction');
 const {cryptoHash} = require("../util/");
+const { REWARD_INPUT, MINING_REWARD } = require("../config");
 
 class Blockchain {
     constructor() {
@@ -13,6 +15,42 @@ class Blockchain {
         });
 
         this.chain.push(newBlock);
+    }
+
+    validTransactionData({chain }){
+
+        for(let i = 1; i<chain.length; i++){
+            const block = chain[i];
+            let rewardTransactionCount = 0;
+
+            
+            for(let transaction of block.data){
+                //check that reward transaction is valid
+                if (transaction.input.address === REWARD_INPUT.address){
+                    rewardTransactionCount+= 1;
+
+                    if(rewardTransactionCount>1){
+                        console.error('Miner rewards exceeds limit')
+                        return false;
+                    }
+
+                    if(Object.values(transaction.outputMap)[0] !== MINING_REWARD){
+                        console.error('Miner reward is invalid');
+                        return false;
+                    }
+                }
+
+                //check that normal transactions are valid
+                else{
+                    if(!Transaction.validTransaction(transaction)){
+                        console.error('Invalid transaction');
+                        return false;
+                    }
+                }
+
+            }
+        }
+        return true;
     }
 
     static isValidChain(chain) {
